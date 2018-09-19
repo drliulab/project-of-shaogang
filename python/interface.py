@@ -297,8 +297,12 @@ class MyGui:
         self.destroy_idbar()
         draw = ImageDraw.Draw(im)
         self.lines = []
-        with open(self.labels[self.labelcnt]['annpath'], 'r') as f:
-            self.lines = f.readlines()
+        try:
+            with open(self.labels[self.labelcnt]['annpath'], 'r') as f:
+                self.lines = f.readlines()
+        except FileNotFoundError:
+            with open(self.labels[self.labelcnt]['annpath'], 'w') as f:
+                pass
         if(len(self.lines)>0 and self.lines[-1] == '\n'):
             self.lines.pop()
 
