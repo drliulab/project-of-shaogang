@@ -573,19 +573,20 @@ def main(argv):
     parser.add_argument('-key',default='',help='key of mp4 name\n')
 
     args = parser.parse_args()
+    # 剪辑视频
     if(args.cls == "cut"):
         mvtxt(args.txtdir)
         ch_time(args.txtdir)
         # 删除原txt文件
         cut(args.videodir, args.txtdir)
-    elif(args.cls == "repair"):
+    elif(args.cls == "repair"): # 修复视频
         findbadvideo(args.videodir,args.repair_out)
         repairvideo(args.repair_out,args.videodir)
-    elif(args.cls == "cap_video"):
+    elif(args.cls == "cap_video"): # 获取视频帧
         cap_video(args.videodir,args.cap_out,args.cap_exe,args.cap_name)
-    elif(args.cls == "mark"):
+    elif(args.cls == "mark"): # 标注工具
         w = MyGui(args.framesdir,args.annsdir,args.mark_cls)
-    elif(args.cls == "chkey"):
+    elif(args.cls == "chkey"): # 替换掉文件名中的中文
         change_key(args.framesdir,args.key)
     
 
