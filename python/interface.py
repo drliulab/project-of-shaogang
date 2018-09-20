@@ -19,20 +19,20 @@ from tkinter import IntVar, StringVar
 
 
 class MyGui:
-    def __init__(self,framesdir,annsdir,mark_cls):
+    def __init__(self, framesdir, annsdir, mark_cls):
         # 创建tkinter主窗口
         self.labelcnt = 0
         self.labelsum = 0
         self.labels = {}
         for d in os.listdir(framesdir):
-            for each_frame in os.listdir(framesdir+d):
+            for each_frame in os.listdir(framesdir + d):
                 self.labels[self.labelsum] = {}
                 self.labels[self.labelsum]['framepath'] = framesdir + d + '/' + each_frame
                 self.labels[self.labelsum]['annpath'] = annsdir + d + '/' + each_frame[:each_frame.rfind('.')] + '.txt'
                 self.labels[self.labelsum]['dropout'] = 0
                 self.labelsum += 1
         print("labelsum : " + str(self.labelsum))
-        print("the last one :" + self.labels[self.labelsum-1]['framepath'])
+        print("the last one :" + self.labels[self.labelsum - 1]['framepath'])
         self.root = tkinter.Tk()
         # 指定主窗口位置与大小
         self.root.geometry('1900x980+10+10')
@@ -42,47 +42,45 @@ class MyGui:
         self.Y = tkinter.IntVar(value=0)
         self.selectPosition = None
         if mark_cls == "zhongkong":
-            self.idtext = {'0':'norm', '1':'look at phone', '2':'sleep'}
+            self.idtext = {'0': 'norm', '1': 'look at phone', '2': 'sleep'}
         elif mark_cls == "zhaxian":
-            self.idtext = {'0':'person'}
+            self.idtext = {'0': 'person'}
         self.idlist = []
         self.lines = []
 
         self.outlog = StringVar()
         self.outlog.set("读取成功！")
         self.text_outlog = tkinter.Label(self.root, font="Helvetica 15 bold", textvariable=self.outlog, state='normal',
-                                          width=3, bg="#4A708B", fg="#8B1A1A",
-                                          disabledforeground="yellow", highlightbackground="black",
-                                          highlightcolor="red", highlightthickness=1, bd=0)
+                                         width=3, bg="#4A708B", fg="#8B1A1A",
+                                         disabledforeground="yellow", highlightbackground="black",
+                                         highlightcolor="red", highlightthickness=1, bd=0)
         self.text_outlog.place(x=1710, y=50 + 35 * 21, width=180, height=150)
 
-
-
-        #canvas尺寸
-        screenWidth = 1703    #root.winfo_screenwidth()
-        screenHeight = 958    #root.winfo_screenheight()
-        #创建顶级组件容器
+        # canvas尺寸
+        screenWidth = 1703  # root.winfo_screenwidth()
+        screenHeight = 958  # root.winfo_screenheight()
+        # 创建顶级组件容器
         # self.top = tkinter.Toplevel(self.root,width=screenWidth,height=screenHeight)
-        #不显示最大化、最小化按钮
-        #self.root.overrideredirect(True)
+        # 不显示最大化、最小化按钮
+        # self.root.overrideredirect(True)
 
-        self.canvas = tkinter.Canvas(self.root,bg='white',width=screenWidth,height=screenHeight)
+        self.canvas = tkinter.Canvas(self.root, bg='white', width=screenWidth, height=screenHeight)
         im = Image.open(self.labels[self.labelcnt]['framepath'])
         im = im.resize((1703, 958))
         self.draw_bbox(im)
         self.image = ImageTk.PhotoImage(im)
-        self.canvas.create_image(0,0,anchor='nw',image=self.image)
+        self.canvas.create_image(0, 0, anchor='nw', image=self.image)
         self.root.title(self.labels[self.labelcnt]['framepath'])
 
         def but_preCaptureClick():
-            if(self.labelcnt == 0):
+            if (self.labelcnt == 0):
                 return
             self.labelcnt -= 1
             if (self.labels[self.labelcnt]['dropout']):
                 temp = self.labelcnt + 1
                 while self.labelcnt >= 0 and self.labels[self.labelcnt]['dropout']:
                     self.labelcnt -= 1
-                if(self.labelcnt < 0):
+                if (self.labelcnt < 0):
                     self.labelcnt = temp
                     return
             ims = Image.open(self.labels[self.labelcnt]['framepath'])
@@ -94,7 +92,7 @@ class MyGui:
             print("self.labelcnt : " + str(self.labelcnt))
 
         def but_afterCaptureClick():
-            if(self.labelcnt == self.labelsum):
+            if (self.labelcnt == self.labelsum):
                 return
 
             self.labelcnt += 1
@@ -102,7 +100,7 @@ class MyGui:
                 temp = self.labelcnt - 1
                 while self.labelcnt < self.labelsum and self.labels[self.labelcnt]['dropout']:
                     self.labelcnt += 1
-                if(self.labelcnt == self.labelsum):
+                if (self.labelcnt == self.labelsum):
                     self.labelcnt = temp
                     return
             ims = Image.open(self.labels[self.labelcnt]['framepath'])
@@ -120,44 +118,39 @@ class MyGui:
                 return
 
             src = self.labels[self.labelcnt]['framepath']
-            name = src[src.rfind('frames')+6:]
-            os.rename(src,'d:/phone/guitest/wait_frames' + name)
+            name = src[src.rfind('frames') + 6:]
+            os.rename(src, 'd:/phone/guitest/wait_frames' + name)
 
             src = self.labels[self.labelcnt]['annpath']
-            name = src[src.rfind('anns')+4:]
+            name = src[src.rfind('anns') + 4:]
             os.rename(src, 'd:/phone/guitest/wait_anns' + name)
             self.labels[self.labelcnt]['dropout'] = 1
             but_afterCaptureClick()
 
-
-
-
         self.canvas.bind('<Button-1>', self.onLeftButtonDown)
         self.canvas.bind('<B1-Motion>', self.onLeftButtonMove)
-        self.canvas.bind('<ButtonRelease-1>',self.onLeftButtonUp)
-        self.canvas.place(x=0,y=0)#pack(fill=tkinter.Y,expand=tkinter.YES)
+        self.canvas.bind('<ButtonRelease-1>', self.onLeftButtonUp)
+        self.canvas.place(x=0, y=0)  # pack(fill=tkinter.Y,expand=tkinter.YES)
 
         self.but_dropout = tkinter.Button(self.root, text="Drop out", command=but_dropoutCaptureClick)
-        self.but_dropout.place(x=1710,y=0,width=80,height=20)
-        self.but_pre = tkinter.Button(self.root,text="<- Prev", command=but_preCaptureClick)
-        self.but_pre.place(x=1710,y=25,width=80,height=20)
+        self.but_dropout.place(x=1710, y=0, width=80, height=20)
+        self.but_pre = tkinter.Button(self.root, text="<- Prev", command=but_preCaptureClick)
+        self.but_pre.place(x=1710, y=25, width=80, height=20)
         self.but_after = tkinter.Button(self.root, text="After ->", command=but_afterCaptureClick)
         self.but_after.place(x=1795, y=25, width=80, height=20)
-
-
 
         # 启动消息主循环
         self.root.mainloop()
 
     # 鼠标左键按下的位置
-    def onLeftButtonDown(self,event):
+    def onLeftButtonDown(self, event):
         self.X.set(event.x)
         self.Y.set(event.y)
         # 开始画框的标志
         self.sel = True
 
     # 鼠标左键移动，显示选取的区域
-    def onLeftButtonMove(self,event):
+    def onLeftButtonMove(self, event):
         if not self.sel:
             return
         global lastDraw
@@ -169,7 +162,7 @@ class MyGui:
         lastDraw = self.canvas.create_rectangle(self.X.get(), self.Y.get(), event.x, event.y, outline='yellow')
 
     # 获取鼠标左键抬起的位置，记录区域
-    def onLeftButtonUp(self,event):
+    def onLeftButtonUp(self, event):
         self.sel = False
         try:
             self.canvas.delete(lastDraw)
@@ -178,7 +171,7 @@ class MyGui:
         sleep(0.1)
         print(event.x, event.y)
         upx = event.x if event.x < 1703 else 1703
-        upy = event.y if event.y <958 else 958
+        upy = event.y if event.y < 958 else 958
         upx = upx if upx > 0 else 0
         upy = upy if upy > 0 else 0
         myleft, myright = sorted([self.X.get(), upx])
@@ -189,7 +182,7 @@ class MyGui:
             self.selectPosition[3]))
         self.but_addCaptureClick()
 
-    def but_confirmCaptureClick(self,event):
+    def but_confirmCaptureClick(self, event):
         # 如果修改了文本框的值，把新值写会标注文件对应行
         the_butt = event.widget
         the_butt_name = the_butt._name
@@ -206,7 +199,7 @@ class MyGui:
                     break
                 if (new_idn not in range(0, 3)):
                     # tkinter.messagebox.showinfo(title='错误', message='必须是0到2的数字')
-                    #self.text_outlog.delete(0, 100)
+                    # self.text_outlog.delete(0, 100)
                     self.outlog.set('Error：0到2的数字')
                     break
                 # print(new_id)
@@ -229,22 +222,22 @@ class MyGui:
         self.canvas.create_image(0, 0, anchor='nw', image=self.image)
         self.root.title(self.labels[self.labelcnt]['framepath'])
 
-    def but_deleteCaptureClick(self,event):
+    def but_deleteCaptureClick(self, event):
         # 删除标注文件中对应行
         # top = tkinter.Toplevel()
         # top.title('警告')
         # msg = tkinter.Message(top,text='删除不可复原，确认删除？',width=150)
         # msg.pack()
-        a = tkinter.messagebox.askokcancel('警告','删除不可复原，确认删除？')
+        a = tkinter.messagebox.askokcancel('警告', '删除不可复原，确认删除？')
 
-        if(a is False):
+        if (a is False):
             return
         else:
             the_butt = event.widget
             the_butt_name = the_butt._name
             for line_i in range(len(self.lines)):
                 # print(n._name)
-                if (self.idlist[line_i * 4+1]._name == the_butt_name):
+                if (self.idlist[line_i * 4 + 1]._name == the_butt_name):
                     newlines = []
                     for i in range(len(self.lines)):
                         if (i == line_i):
@@ -267,19 +260,19 @@ class MyGui:
         # 新添加Label控件和Entry控件以及Button，接收在canvas中点出的框坐标
         self.canvas.create_rectangle(self.selectPosition[0], self.selectPosition[2], self.selectPosition[1],
                                      self.selectPosition[3], outline="red")
-        w = self.selectPosition[1]-self.selectPosition[0]
-        h = self.selectPosition[3]-self.selectPosition[2]
-        x = (self.selectPosition[0] + w/2) / 1703.0
-        y = (self.selectPosition[2] + h/2) / 958.0
-        w = w/1703.0
-        h = h/958.0
-        bbox = ('0',str('%.6f'%x),str('%.6f'%y),str('%.6f'%w),str('%.6f'%h))
+        w = self.selectPosition[1] - self.selectPosition[0]
+        h = self.selectPosition[3] - self.selectPosition[2]
+        x = (self.selectPosition[0] + w / 2) / 1703.0
+        y = (self.selectPosition[2] + h / 2) / 958.0
+        w = w / 1703.0
+        h = h / 958.0
+        bbox = ('0', str('%.6f' % x), str('%.6f' % y), str('%.6f' % w), str('%.6f' % h))
         new_line = ' '.join(bbox)
         print(new_line)
         self.lines.append(new_line)
         with open(self.labels[self.labelcnt]['annpath'], 'w') as annfile:
             annfile.writelines(self.lines)
-        self.outlog.set('添加成功！请标注\n第' + str(self.num+1) + '行')
+        self.outlog.set('添加成功！请标注\n第' + str(self.num + 1) + '行')
         ims = Image.open(self.labels[self.labelcnt]['framepath'])
         ims = ims.resize((1703, 958))
         self.draw_bbox(ims)
@@ -293,19 +286,19 @@ class MyGui:
         self.idlist = []
         # self.text_outlog.delete(0, 100)
 
-    def draw_bbox(self,im):
+    def draw_bbox(self, im):
         self.destroy_idbar()
         draw = ImageDraw.Draw(im)
         self.lines = []
         with open(self.labels[self.labelcnt]['annpath'], 'r') as f:
             self.lines = f.readlines()
-        if(len(self.lines)>0 and self.lines[-1] == '\n'):
+        if (len(self.lines) > 0 and self.lines[-1] == '\n'):
             self.lines.pop()
 
         bboxs = []
         ids = []
         for i in range(len(self.lines)):
-            if('\n' not in self.lines[i]):
+            if ('\n' not in self.lines[i]):
                 self.lines[i] = self.lines[i] + '\n'
             line = self.lines[i].strip().split(' ')
             bboxs.append([line[1], line[2], line[3], line[4]])
@@ -336,15 +329,15 @@ class MyGui:
             # but_confirm.bind('<ButtonRelease-1>',self.but_confirmrelease)
             but_delete = tkinter.Button(self.root, text="删除")
             but_delete.place(x=1831, y=50 + 35 * (self.num - 1), width=50, height=30)
-            but_delete.bind('<Button-1>',self.but_deleteCaptureClick)
+            but_delete.bind('<Button-1>', self.but_deleteCaptureClick)
 
             self.idlist.append(but_confirm)
             self.idlist.append(but_delete)
             self.idlist.append(text)
             self.idlist.append(e)
-        # but_add = tkinter.Button(self.root, text="添加", command=self.but_addCaptureClick)
-        # but_add.place(x=1780, y=50 + 35 * (self.num), width=50, height=30)
-        # self.idlist.append(but_add)
+            # but_add = tkinter.Button(self.root, text="添加", command=self.but_addCaptureClick)
+            # but_add.place(x=1780, y=50 + 35 * (self.num), width=50, height=30)
+            # self.idlist.append(but_add)
 
 
 def mvtxt(txtdir):
@@ -361,6 +354,7 @@ def mvtxt(txtdir):
             else:
                 cc += 1
                 shutil.copyfile(txtdir + t, txtdir + t[:t.rfind('.')] + '/' + t)
+
 
 def ch_time(txtdir):
     for tn in os.listdir(txtdir):
@@ -383,7 +377,8 @@ def ch_time(txtdir):
             with open(txtdir + tn + '/' + tn + '_changetime.txt', 'w') as f:
                 f.writelines(newlines)
 
-def cut(videodir,chtdir):
+
+def cut(videodir, chtdir):
     cnt = 0
 
     flag = 0
@@ -417,9 +412,10 @@ def cut(videodir,chtdir):
         clip.reader.close()
 
         cnt += 1
-    #下面将地址和属性写进数据库
+        # 下面将地址和属性写进数据库
 
-def findbadvideo(videodir,outdir):
+
+def findbadvideo(videodir, outdir):
     sum = 0
     for d in os.listdir(videodir):
         if ('7号' in d):
@@ -440,7 +436,8 @@ def findbadvideo(videodir,outdir):
                                 sum += 1
                                 shutil.copyfile(filename, outdir + filename.split('/')[3])
 
-def repairvideo(badvideodir,outdir,liwai):
+
+def repairvideo(badvideodir, outdir, liwai):
     fps = 25
     for each_video in os.listdir(badvideodir):
         name = each_video[each_video.find('_'):each_video.rfind('.')]
@@ -506,20 +503,21 @@ def repairvideo(badvideodir,outdir,liwai):
             pass
             print(e)
 
-def cap_video(videodir,outdir,exepath,cap_name):
+
+def cap_video(videodir, outdir, exepath, cap_name):
     videoname = []
     for file in os.listdir(videodir):
         if cap_name in file:
-            for mp4 in os.listdir(videodir+file):
+            for mp4 in os.listdir(videodir + file):
                 index = mp4.rfind('.')
-                videoname.append([mp4[:index],file])
+                videoname.append([mp4[:index], file])
 
     cnt = 0
-    for name,file in videoname:
+    for name, file in videoname:
         try:
             os.makedirs(outdir + name)
         except FileExistsError:
-            print("已存在：" + outdir+name)
+            print("已存在：" + outdir + name)
             continue
         except Exception as e:
             print(e)
@@ -531,13 +529,14 @@ def cap_video(videodir,outdir,exepath,cap_name):
         if cnt < 20:
             os.system(cmd)
         else:
-            cmd = "start /min /wait " + exepath + " " + outdir + name + " cap_video " + videodir + file + "/"  + name + ".mp4 600"
+            cmd = "start /min /wait " + exepath + " " + outdir + name + " cap_video " + videodir + file + "/" + name + ".mp4 600"
             print(cmd)
             os.system(cmd)
             cnt = 0
             time.sleep(60)
 
-def change_key(framesdir,chkey):
+
+def change_key(framesdir, chkey):
     if chkey == '7号高炉中控室':
         key = '7'
     elif chkey == '大棒线粗轧轧机区':
@@ -549,41 +548,42 @@ def change_key(framesdir,chkey):
             n = f.replace(chkey, key)
             os.rename(framesdir + newname + '/' + f, framesdir + newname + '/' + n)
 
+
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-cls', default='cut',help='cls of interface')
+    parser.add_argument('-cls', default='cut', help='cls of interface')
     parser.add_argument('-txtdir', default='\\path\\to\\txtdir',
                         help='path to txtdir\n')
     parser.add_argument('-videodir', default='\\path\\to\\videodir',
                         help='path to videodir\n')
-    parser.add_argument('-repair_out',default='\\path\\to\\repairoutdir',
+    parser.add_argument('-repair_out', default='\\path\\to\\repairoutdir',
                         help='path to after repair dir')
-    parser.add_argument('-repair_except', default='',help='except not to repair')
-    parser.add_argument('-cap_out',default='',help='cap_video frame out dir')
-    parser.add_argument('-cap_exe',default='',help='cap_frames tool exe path')
-    parser.add_argument('-cap_name',default='',help='first name of mp4')
-    parser.add_argument('-framesdir',default='',help='path to frames dir\n')
+    parser.add_argument('-repair_except', default='', help='except not to repair')
+    parser.add_argument('-cap_out', default='', help='cap_video frame out dir')
+    parser.add_argument('-cap_exe', default='', help='cap_frames tool exe path')
+    parser.add_argument('-cap_name', default='', help='first name of mp4')
+    parser.add_argument('-framesdir', default='', help='path to frames dir\n')
     parser.add_argument('-annsdir', default='', type=str,
                         help='Output annotations directory\n')
-    parser.add_argument('-mark_cls',default='',help='mark cls: zhongkong zhaxian\n')
-    parser.add_argument('-key',default='',help='key of mp4 name\n')
+    parser.add_argument('-mark_cls', default='', help='mark cls: zhongkong zhaxian\n')
+    parser.add_argument('-key', default='', help='key of mp4 name\n')
 
     args = parser.parse_args()
-    if(args.cls == "cut"):
+    if (args.cls == "cut"):
         mvtxt(args.txtdir)
         ch_time(args.txtdir)
         # 删除原txt文件
         cut(args.videodir, args.txtdir)
-    elif(args.cls == "repair"):
-        findbadvideo(args.videodir,args.repair_out)
-        repairvideo(args.repair_out,args.videodir)
-    elif(args.cls == "cap_video"):
-        cap_video(args.videodir,args.cap_out,args.cap_exe,args.cap_name)
-    elif(args.cls == "mark"):
-        w = MyGui(args.framesdir,args.annsdir,args.mark_cls)
-    elif(args.cls == "chkey"):
-        change_key(args.framesdir,args.key)
-    
+    elif (args.cls == "repair"):
+        findbadvideo(args.videodir, args.repair_out)
+        repairvideo(args.repair_out, args.videodir)
+    elif (args.cls == "cap_video"):
+        cap_video(args.videodir, args.cap_out, args.cap_exe, args.cap_name)
+    elif (args.cls == "mark"):
+        w = MyGui(args.framesdir, args.annsdir, args.mark_cls)
+    elif (args.cls == "chkey"):
+        change_key(args.framesdir, args.key)
+
 
 if __name__ == '__main__':
     main(sys.argv)
