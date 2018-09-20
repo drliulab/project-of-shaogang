@@ -19,7 +19,7 @@ from tkinter import IntVar, StringVar
 
 
 class MyGui:
-    def __init__(self, framesdir, annsdir, mark_cls):
+    def __init__(self, framesdir, annsdir, mark_cls,drop):
         # 创建tkinter主窗口
         self.labelcnt = 0
         self.labelsum = 0
@@ -119,11 +119,23 @@ class MyGui:
 
             src = self.labels[self.labelcnt]['framepath']
             name = src[src.rfind('frames') + 6:]
-            os.rename(src, 'd:/phone/guitest/wait_frames' + name)
+            if not os.path.exists(drop + 'wait_frames'):
+                os.makedirs(drop+'wait_frames')
+            folder = drop + 'wait_frames' + name
+            folder = folder[:folder.rfind('/')]
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            os.rename(src, drop + 'wait_frames' + name)
 
             src = self.labels[self.labelcnt]['annpath']
             name = src[src.rfind('anns') + 4:]
-            os.rename(src, 'd:/phone/guitest/wait_anns' + name)
+            if not os.path.exists(drop + 'wait_anns'):
+                os.makedirs(drop+'wait_anns')
+            folder = drop + 'wait_anns' + name
+            folder = folder[:folder.rfind('/')]
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            os.rename(src, drop + 'wait_anns' + name)
             self.labels[self.labelcnt]['dropout'] = 1
             but_afterCaptureClick()
 
@@ -578,6 +590,7 @@ def main(argv):
                         help='Output annotations directory\n')
     parser.add_argument('-mark_cls', default='', help='mark cls: zhongkong zhaxian\n')
     parser.add_argument('-key', default='', help='key of mp4 name\n')
+    parser.add_argument('-drop', default='', help='drop out dir\n')
 
     args = parser.parse_args()
     # 剪辑视频
@@ -592,7 +605,7 @@ def main(argv):
     elif (args.cls == "cap_video"):  # 获取视频帧
         cap_video(args.videodir, args.cap_out, args.cap_exe, args.cap_name)
     elif (args.cls == "mark"):  # 标注工具
-        w = MyGui(args.framesdir, args.annsdir, args.mark_cls)
+        w = MyGui(args.framesdir, args.annsdir, args.mark_cls,args.drop)
     elif (args.cls == "chkey"):  # 替换掉文件名中的中文
         change_key(args.framesdir, args.key)
 
