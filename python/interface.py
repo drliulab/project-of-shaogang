@@ -448,11 +448,19 @@ def cut(videodir, analys_out):
 # 给剪辑视频添加标注 将地址和属性写进数据库
 def init_db(db_host, db_name, db_username, db_pwd, db_charset):
     pass
-    conn = pymssql.connect(db_host,db_name,db_username,db_pwd)
+    try:
+        conn = pymssql.connect(db_host,db_name,db_username,db_pwd)
+    except Exception as err:
+        print("Error decoding config file: %s" % str(err))
+        sys.exit(1)
     return conn
 
 def close_db(conn):
-    conn.close()
+    try:
+        conn.close()
+    except Exception as err:
+        print("Error decoding config file: %s" % str(err))
+        sys.exit(1)
 
 def write_db(conn,filename,path,date,duration,device,category):
     cur = conn.cursor()
@@ -462,8 +470,13 @@ def write_db(conn,filename,path,date,duration,device,category):
     if 2 in category:
         cat |= 0b10
 
-    cur.execute("insert into chaxun1(filename,path,date,duration,device,category) VALUES ('%s','%s','%s',%d,'%s',%d)" % (filename,path,date,duration,device,cat))
-    conn.comit()
+    try:
+        cur.execute("insert into chaxun1(filename,path,date,duration,device,category) VALUES ('%s','%s','%s',%d,'%s',%d)" % (filename,path,date,duration,device,cat))
+        conn.comit()
+        cur.close()
+    except Exception as err:
+        print("Error decoding config file: %s" % str(err))
+        sys.exit(1)
 
 def name(analys_out, conn):
     cnt = 0
