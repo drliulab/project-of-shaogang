@@ -17,6 +17,8 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from time import sleep
 from tkinter import IntVar, StringVar
 
+import pymssql
+
 
 class MyGui:
     def __init__(self, framesdir, annsdir, mark_cls,drop):
