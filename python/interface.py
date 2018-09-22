@@ -378,13 +378,15 @@ def mvtxt(analys_out):
     for t in os.listdir(analys_out):
         if os.path.isfile(analys_out + t):
             cnt += 1
-            if not os.path.exists(analys_out + t[:t.rfind('_')]):
-                os.mkdir(analys_out + t[:t.rfind('_')])
             if t[t.rfind('_'):][1] == 'b':
                 c += 1
+                if not os.path.exists(analys_out + t[:t.rfind('_')]):
+                    os.mkdir(analys_out + t[:t.rfind('_')])
                 os.rename(analys_out + t, analys_out + t[:t.rfind('_')] + '/' + t)
             else:
                 cc += 1
+                if not os.path.exists(analys_out + t[:t.rfind('.')]):
+                    os.mkdir(analys_out + t[:t.rfind('.')])
                 os.rename(analys_out + t, analys_out + t[:t.rfind('.')] + '/' + t)
 
 
@@ -398,10 +400,10 @@ def ch_time(analys_out):
             newlines = []
             for line in lines:
                 t = line.strip().split(' ')
-                s = int(t[0]) / 25
+                s = int(int(t[0]) / 25)
 
                 line = str(s)
-                s = int(t[1]) / 25
+                s = int(int(t[1]) / 25)
 
                 line = line + ' ' + str(s) + '\n'
                 newlines.append(line)
@@ -416,8 +418,10 @@ def cut(videodir, analys_out):
     flag = 0
 
     for vn in os.listdir(videodir):
+        print(vn+'start! \n')
         name = vn[:vn.rfind('.')]       # 找出mp4文件的名字
         for ds in os.listdir(analys_out + name + '/'):
+            print(ds+'\n')
             if ds[:ds.rfind('_')] == 'cuted':       # 对应名字的文件夹下如果有已经切过的
                 flag = 1
                 break
@@ -427,12 +431,15 @@ def cut(videodir, analys_out):
             flag = 0
             continue
 
+        print(videodir + vn + ' clip\n')
         clip = VideoFileClip(videodir + vn)             # clip是剪辑类对象
+        print(videodir + vn + ' clip done\n')
         lines = []
         with open(analys_out + name + '/' + name + '_changetime.txt', 'r') as f:
             lines = f.readlines()
 
         i = 0
+        print('sdf\n')
         for line in lines:
             i += 1
             line = line.strip().split(' ')
@@ -443,13 +450,15 @@ def cut(videodir, analys_out):
                                                         # 保存
         clip.reader.close()
         cnt += 1
+        print(vn+' done!\n')
+
 
 
 # 给剪辑视频添加标注 将地址和属性写进数据库
 def init_db(db_host, db_name, db_username, db_pwd, db_charset):
-    pass
+    print("init_db\n")
     try:
-        conn = pymssql.connect(db_host,db_name,db_username,db_pwd)
+        conn = pymssql.connect(host = db_host,database=db_name,user=db_username,password=db_pwd,charset=db_charset)
     except Exception as err:
         print("Error decoding config file: %s" % str(err))
         sys.exit(1)
@@ -472,7 +481,7 @@ def write_db(conn,filename,path,date,duration,device,category):
 
     try:
         cur.execute("insert into chaxun1(filename,path,date,duration,device,category) VALUES ('%s','%s','%s',%d,'%s',%d)" % (filename,path,date,duration,device,cat))
-        conn.comit()
+        conn.commit()
         cur.close()
     except Exception as err:
         print("Error decoding config file: %s" % str(err))
@@ -589,7 +598,7 @@ def name(analys_out, conn):
                             # 以后开发根据原视频名判断属于哪个DEVICE的功能
                             # 以后开发根据原视频名判断日期
                             device = DEVICE[0]
-                            date = ZKDATE[d[d.find('_'):]]
+                            date = ZKDATE[d[d.find('_'):d.rfind('_')]]
                             path = analys_out + d + '/' + filename
                             videowriter = cv2.VideoWriter(path, cv2.VideoWriter_fourcc('D', 'I', 'V', 'X'), fps, size)
                             flag = 0
@@ -611,7 +620,8 @@ def name(analys_out, conn):
 
                         line = line.strip().split(' ')
                         cls = int(line[0])
-                        category.add(cls)
+                        if sflag:
+                            category.add(cls)
                         x = float(line[1]) * 1920
                         y = float(line[2]) * 1080
                         w = float(line[3]) * 1920
