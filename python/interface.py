@@ -46,7 +46,7 @@ class MyGui:
         if mark_cls == "zhongkong":
             self.idtext = {'0': 'norm', '1': 'look at phone', '2': 'sleep'}
         elif mark_cls == "zhaxian":
-            self.idtext = {'0': 'person'}
+            self.idtext = {'0': 'person', '1': ' ', '2': ' '}
         self.idlist = []
         self.lines = []
 
