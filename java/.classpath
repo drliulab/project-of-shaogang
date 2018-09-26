@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="plugins"/>
+	<classpathentry kind="lib" path="E:/sqljdbc/Microsoft JDBC Driver 6.2 for SQL Server/sqljdbc_6.2/chs/mssql-jdbc-6.2.2.jre7.jar"/>
+	<classpathentry kind="lib" path="E:/sqljdbc/Microsoft JDBC Driver 6.2 for SQL Server/sqljdbc_6.2/chs/mssql-jdbc-6.2.2.jre8.jar"/>
+	<classpathentry kind="lib" path="E:/相关下载/org.eclipse.swt.win32.win32.x86_64_3.100.1.v4236b.jar"/>
+	<classpathentry kind="lib" path="E:/vlcj-3.10.1-dist/vlcj-3.10.1/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="E:/vlcj-3.10.1-dist/vlcj-3.10.1/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="E:/vlcj-3.10.1-dist/vlcj-3.10.1/vlcj-3.10.1.jar"/>
+	<classpathentry kind="lib" path="E:/slf4j-1.7.25/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="E:/slf4j-1.7.25/slf4j-nop-1.7.25.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
