@@ -283,7 +283,7 @@ public class Window extends JFrame {
 			public void itemStateChanged(ItemEvent e) {
 				// 只处理选中的状态
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					month = (String) comboBox3.getSelectedItem();
+					month = "" + ((int) comboBox3.getSelectedIndex()+1);
 					System.out.println(month);
 				}
 			}
@@ -301,7 +301,7 @@ public class Window extends JFrame {
 			public void itemStateChanged(ItemEvent e) {
 				// 只处理选中的状态
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					day= (String) comboBox4.getSelectedItem();
+					day= "" + (1 + (int) comboBox4.getSelectedIndex());
 					System.out.println(day);
 				}
 			}
@@ -318,7 +318,7 @@ public class Window extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("点击查询 ");
-				date = year + "-" + month + "-" + day;
+				date = year + "." + month + "." + day;
 				System.out.println(date);
 				try {
 					model.setRowCount(0);
@@ -326,9 +326,9 @@ public class Window extends JFrame {
 
 					// 2.得到连接(引包)[指定连接到那个数据源"sa""sa"是用户名和密码]
 					// 如果配置数据源使用windows nt就不需要用户名和密码
-					String url = "jdbc:sqlserver://localhost:1435;DatabaseName=钢铁厂;";
+					String url = "jdbc:sqlserver://localhost:61647;DatabaseName=shaogang;";
 
-					ct = DriverManager.getConnection(url, "sa", "319958");
+					ct = DriverManager.getConnection(url, "sa", "1234qwer");
 					ps = ct.prepareStatement("select * from chaxun1 where category = ? and date = ? and duration between ? and ? ");
 					ps.setInt(1, a);
 					ps.setString(2, date);
@@ -341,7 +341,7 @@ public class Window extends JFrame {
 						Vector hang = new Vector();
 						hang.add(rs.getString(1));
 						hang.add(rs.getString(2));
-						hang.add(rs.getDate(3));
+						hang.add(rs.getString(3));
 						hang.add(rs.getInt(4));
 						hang.add(rs.getString(5));
 						hang.add(rs.getInt(6));
@@ -383,8 +383,8 @@ public class Window extends JFrame {
 		    		String filename= table.getValueAt(row, 0).toString();
 		    		String path= table.getValueAt(row, 1).toString();
 		    		//String	e="\"";
-		    		String		f=".MKV";
-		    		AbsolutePath =(String) (path + filename+f) ;
+		    		//String		f=".";
+		    		AbsolutePath =(String) (path) ;
 		    		System.out.println("选中表格");
 		    		System.out.println(AbsolutePath);
 		    		//直接播放
